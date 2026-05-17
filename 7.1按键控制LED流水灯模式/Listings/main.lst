@@ -1,0 +1,66 @@
+C51 COMPILER V9.54   MAIN                                                                  05/17/2026 21:32:15 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Timer0.h"
+   3          #include "Key.h"
+   4          #include <INTRINS.H>
+   5          unsigned char Keynum,LEDMode;
+   6          void main()
+   7          {
+   8   1              P2=0xFE;
+   9   1              Timer0_Init();
+  10   1              while(1)
+  11   1              {
+  12   2                      Keynum=Key();
+  13   2                      if(Keynum==1)
+  14   2                      {
+  15   3                              LEDMode++;
+  16   3                              if(LEDMode>=2)
+  17   3                                      LEDMode=0;
+  18   3                      }
+  19   2              }
+  20   1      }
+  21          
+  22          void Timer0_Routinue() interrupt 1
+  23          {
+  24   1              /*TH0=64536/256;
+  25   1              TL0=64536%256;*/
+  26   1              static unsigned int T0Count;
+  27   1              TL0=0x18;
+  28   1              TH0=0xFC;
+  29   1              T0Count++;
+  30   1              if(T0Count>=500)
+  31   1              {
+  32   2                      T0Count=0;
+  33   2                      if(LEDMode==0)
+  34   2                      {
+  35   3                              P2=_crol_(P2,1);
+  36   3                      }
+  37   2                      if(LEDMode==1)
+  38   2                      {
+  39   3                              P2=_cror_(P2,1);
+  40   3                      }
+  41   2              }
+  42   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    114    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
