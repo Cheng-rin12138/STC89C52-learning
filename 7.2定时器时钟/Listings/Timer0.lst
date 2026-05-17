@@ -1,0 +1,58 @@
+C51 COMPILER V9.54   TIMER0                                                                05/17/2026 21:58:15 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE TIMER0
+OBJECT MODULE PLACED IN .\Objects\Timer0.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Timer0.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\Ti
+                    -mer0.lst) OBJECT(.\Objects\Timer0.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          
+   3          void Timer0_Init()//1毫秒@12.000MHz
+   4          {
+   5   1              /*TMOD=0x01;//0000 0001
+   6   1              TF0=0;//
+   7   1              TR0=1;//打开计数器开关
+   8   1              TH0=64536/256;
+   9   1              TL0=64536%256;*/
+  10   1              //AUXR &= 0x7F;         //定时器时钟12T模式
+  11   1              TMOD &= 0xF0;           //设置定时器模式
+  12   1              TMOD |= 0x01;           //设置定时器模式
+  13   1              TL0 = 0x18;             //设置定时初值
+  14   1              TH0 = 0xFC;             //设置定时初值
+  15   1              TF0 = 0;                //清除TF0标志
+  16   1              TR0 = 1;                //定时器0开始计时
+  17   1              
+  18   1              ET0=1;
+  19   1              EA=1;
+  20   1              PT0=1;
+  21   1      }
+  22          /*unsigned int T0Count;
+  23          void Timer0_Routinue() interrupt 1
+  24          {
+  25                  
+  26                  TL0=0x18;
+  27                  TH0=0xFC;
+  28                  T0Count++;
+  29                  if(T0Count>=2000)
+  30                  {
+  31                          T0Count=0;
+  32                          
+  33                  }
+  34          }*/
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     23    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
