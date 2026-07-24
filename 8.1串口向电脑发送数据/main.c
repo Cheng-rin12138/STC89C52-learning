@@ -13,13 +13,3 @@ void main()
 	}
 
 }
-void UART_Routinue() interrupt 4
-{
-	//检测用：P2=0x00;//灯全亮表示进入中断函数
-	if(RI==1)//接收完毕
-	{
-		P2=~SBUF;
-		UART_SendByte(SBUF);
-		RI=0;//软件复位
-	}
-}

@@ -1,4 +1,4 @@
-C51 COMPILER V9.54   MAIN                                                                  07/24/2026 16:15:42 PAGE 1   
+C51 COMPILER V9.54   MAIN                                                                  07/24/2026 16:12:21 PAGE 1   
 
 
 C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
@@ -23,10 +23,20 @@ line level    source
   13   2              }
   14   1      
   15   1      }
+  16          void UART_Routinue() interrupt 4
+  17          {
+  18   1              P2=0x00;//灯全亮表示进入中断函数
+  19   1      //      if(RI==1)//接收完毕
+  20   1      //      {
+  21   1      //              P2=~SBUF;
+  22   1      //              UART_SendByte(SBUF);
+  23   1      //              RI=0;//软件复位
+  24   1      //      }
+  25   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =     19    ----
+   CODE SIZE        =     23    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
