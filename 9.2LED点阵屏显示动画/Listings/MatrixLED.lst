@@ -1,0 +1,75 @@
+C51 COMPILER V9.54   MATRIXLED                                                             07/25/2026 14:38:45 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MATRIXLED
+OBJECT MODULE PLACED IN .\Objects\MatrixLED.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE MatrixLED.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\MatrixLED.lst) OBJECT(.\Objects\MatrixLED.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Delay.h"
+   3          
+   4          sbit RCK=P3^5;//把P3的第5位声明为RCLK时钟
+   5          sbit SCK=P3^6;//SRCLK
+   6          sbit SER=P3^4;//SER寄存器
+   7          
+   8          #define MATRIX_LED_PORT P0
+   9          /**
+  10             * @brief 74H595写入1个字节
+  11             * @param 要写入的字节
+  12             * @retval 无
+  13             */
+  14          void _74HC595_WriteByte(unsigned char Byte)
+  15          {
+  16   1              unsigned char i;
+  17   1              for(i=0;i<8;i++)
+  18   1              {
+  19   2                      SER=Byte&(0x80>>i);
+  20   2                      SCK=1;
+  21   2                      SCK=0;
+  22   2              }
+  23   1              RCK=1;//发送到IO口上准备输出
+  24   1              RCK=0;//置零
+  25   1      }
+  26          
+  27          /**
+  28             * @brief LED点阵屏显示一列数据
+  29             * @param Column要选择的列，范围：0~7，0在最左边
+  30             * @param Data选择列显示的数据，高位在上，1为亮，0为灭
+  31             * @retval 无
+  32             */
+  33          void MatrixLED_ShowColumn(unsigned char Column,Data)
+  34          {
+  35   1              _74HC595_WriteByte(Data);
+  36   1              MATRIX_LED_PORT=~(0x80>>Column);
+  37   1              Delay(1);
+  38   1              MATRIX_LED_PORT=0xFF;
+  39   1      }
+  40          /**
+  41             * @brief 点阵屏初始化
+  42             * @param 无
+  43             * @retval 无
+  44             */
+  45          void MatrixLED_Init()
+  46          {
+  47   1              SCK=0;
+  48   1              RCK=0;
+  49   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     84    ----
+   CONSTANT SIZE    =   ----    ----
+C51 COMPILER V9.54   MATRIXLED                                                             07/25/2026 14:38:45 PAGE 2   
+
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
