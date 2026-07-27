@@ -1,0 +1,169 @@
+C51 COMPILER V9.54   MAIN                                                                  07/27/2026 20:38:20 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "LCD1602.h"
+   3          #include "DS1302.h"
+   4          #include "Key.h"
+   5          #include "Timer0.h"
+   6          
+   7          unsigned char KeyNum,MODE,TimeSetSelect,TimeSetFlashFlag;
+   8          
+   9          void TimeShow(void)
+  10          {
+  11   1                      DS1302_ReadTime();
+  12   1                      LCD_ShowNum(1,1,DS1302_Time[0],2);
+  13   1                      LCD_ShowNum(1,4,DS1302_Time[1],2);
+  14   1                      LCD_ShowNum(1,7,DS1302_Time[2],2);
+  15   1                      LCD_ShowNum(2,1,DS1302_Time[3],2);
+  16   1                      LCD_ShowNum(2,4,DS1302_Time[4],2);
+  17   1                      LCD_ShowNum(2,7,DS1302_Time[5],2);
+  18   1      }
+  19          void TimeSet(void)
+  20          {
+  21   1              //1.切换选位
+  22   1              if(KeyNum==2)
+  23   1              {
+  24   2                      TimeSetSelect++;
+  25   2                      TimeSetSelect%=6;//防止溢出
+  26   2              }
+  27   1              //2.时间加减
+  28   1              if(KeyNum==3)
+  29   1              {
+  30   2                      DS1302_Time[TimeSetSelect]++;
+  31   2                      //越界判断
+  32   2                      if(DS1302_Time[0]>99){DS1302_Time[0]=0;}//年
+  33   2                      if(DS1302_Time[1]>12){DS1302_Time[1]=1;}//月
+  34   2                      if(DS1302_Time[1]==1||DS1302_Time[1]==3||DS1302_Time[1]==5||DS1302_Time[1]==7||DS1302_Time[1]==8||DS1302
+             -_Time[1]==10||DS1302_Time[1]==12)//大月
+  35   2                      {
+  36   3                              if(DS1302_Time[2]>31){DS1302_Time[2]=1;}
+  37   3                      }
+  38   2                      else if(DS1302_Time[1]==4||DS1302_Time[1]==6||DS1302_Time[1]==9||DS1302_Time[1]==11)//小月
+  39   2                      {
+  40   3                              if(DS1302_Time[2]>30){DS1302_Time[2]=1;}
+  41   3                      }
+  42   2                      else if(DS1302_Time[1]==2)//2月
+  43   2                      {
+  44   3                              if(DS1302_Time[0]%4==0)//闰年
+  45   3                              {
+  46   4                                      if(DS1302_Time[2]>29){DS1302_Time[2]=1;}
+  47   4                              }
+  48   3                              else//平年
+  49   3                              {
+  50   4                                      if(DS1302_Time[2]>28){DS1302_Time[2]=1;}
+  51   4                              }
+  52   3                      }
+  53   2                      if(DS1302_Time[3]>23){DS1302_Time[3]=0;}
+C51 COMPILER V9.54   MAIN                                                                  07/27/2026 20:38:20 PAGE 2   
+
+  54   2                      if(DS1302_Time[4]>59){DS1302_Time[4]=0;}
+  55   2                      if(DS1302_Time[5]>59){DS1302_Time[5]=0;}
+  56   2              }
+  57   1              if(KeyNum==4)
+  58   1              {
+  59   2                      DS1302_Time[TimeSetSelect]--;
+  60   2                      //越界判断
+  61   2                      if(DS1302_Time[0]<0){DS1302_Time[0]=99;}//年
+  62   2                      if(DS1302_Time[1]<1){DS1302_Time[1]=12;}//月
+  63   2                      if(DS1302_Time[1]==1||DS1302_Time[1]==3||DS1302_Time[1]==5||DS1302_Time[1]==7||DS1302_Time[1]==8||DS1302
+             -_Time[1]==10||DS1302_Time[1]==12)//大月
+  64   2                      {
+  65   3                              if(DS1302_Time[2]<1){DS1302_Time[2]=31;}
+  66   3                      }
+  67   2                      else if(DS1302_Time[1]==4||DS1302_Time[1]==6||DS1302_Time[1]==9||DS1302_Time[1]==11)//小月
+  68   2                      {
+  69   3                              if(DS1302_Time[2]<1){DS1302_Time[2]=30;}
+  70   3                              if(DS1302_Time[2]>30){DS1302_Time[2]=30;}
+  71   3                      }
+  72   2                      else if(DS1302_Time[1]==2)//2月
+  73   2                      {
+  74   3                              if(DS1302_Time[0]%4==0)//闰年
+  75   3                              {
+  76   4                                      if(DS1302_Time[2]<1){DS1302_Time[2]=29;}
+  77   4                                      if(DS1302_Time[2]>29){DS1302_Time[2]=29;}
+  78   4                              }
+  79   3                              else//平年
+  80   3                              {
+  81   4                                      if(DS1302_Time[2]<1){DS1302_Time[2]=28;}
+  82   4                                      if(DS1302_Time[2]>28){DS1302_Time[2]=28;}
+  83   4                              }
+  84   3                      }
+  85   2                      if(DS1302_Time[3]<0){DS1302_Time[3]=23;}
+  86   2                      if(DS1302_Time[4]<0){DS1302_Time[4]=59;}
+  87   2                      if(DS1302_Time[5]<0){DS1302_Time[5]=59;}
+  88   2              }
+  89   1              //3.更新时间
+  90   1              if(TimeSetSelect==0 && TimeSetFlashFlag==1){LCD_ShowString(1,1,"  ");}//选中该位闪烁
+  91   1              else{LCD_ShowNum(1,1,DS1302_Time[0],2);}//同理改其他位闪烁
+  92   1              if(TimeSetSelect==1 && TimeSetFlashFlag==1){LCD_ShowString(1,4,"  ");}
+  93   1              else{LCD_ShowNum(1,4,DS1302_Time[1],2);}
+  94   1              if(TimeSetSelect==2 && TimeSetFlashFlag==1){LCD_ShowString(1,7,"  ");}
+  95   1              else{LCD_ShowNum(1,7,DS1302_Time[2],2);}
+  96   1              if(TimeSetSelect==3 && TimeSetFlashFlag==1){LCD_ShowString(2,1,"  ");}
+  97   1              else{LCD_ShowNum(2,1,DS1302_Time[3],2);}
+  98   1              if(TimeSetSelect==4 && TimeSetFlashFlag==1){LCD_ShowString(2,4,"  ");}
+  99   1              else{LCD_ShowNum(2,4,DS1302_Time[4],2);}
+ 100   1              if(TimeSetSelect==5 && TimeSetFlashFlag==1){LCD_ShowString(2,7,"  ");}
+ 101   1              else{LCD_ShowNum(2,7,DS1302_Time[5],2);}
+ 102   1              LCD_ShowString(2,10,"SET");
+ 103   1              LCD_ShowNum(2,13,TimeSetSelect,2);
+ 104   1      }
+ 105          void main()
+ 106          {
+ 107   1              LCD_Init();
+ 108   1              DS1302_Init();
+ 109   1              Timer0_Init();
+ 110   1              LCD_ShowString(1,1,"  -  -  ");
+ 111   1              LCD_ShowString(2,1,"  :  :  ");
+ 112   1              DS1302_SetTime();
+ 113   1              while(1)
+ 114   1              {
+C51 COMPILER V9.54   MAIN                                                                  07/27/2026 20:38:20 PAGE 3   
+
+ 115   2                      KeyNum=Key();//读取按键获取值0~4
+ 116   2                      if(KeyNum==1)
+ 117   2                      {
+ 118   3                              if(MODE==0){MODE=1;TimeSetSelect=0;}
+ 119   3                              else if(MODE==1){MODE=0;DS1302_SetTime();LCD_ShowString(2,10,"     ");}
+ 120   3                      }
+ 121   2                      switch(MODE)
+ 122   2                      {
+ 123   3                              case 0:TimeShow();break;
+ 124   3                              case 1:TimeSet();break;
+ 125   3                      }
+ 126   2              }
+ 127   1      }
+ 128          void Timer0_Routinue() interrupt 1
+ 129          {
+ 130   1              static unsigned int T0Count;
+ 131   1              TL0=0x18;
+ 132   1              TH0=0xFC;
+ 133   1              T0Count++;
+ 134   1              if(T0Count>=500)
+ 135   1              {
+ 136   2                      T0Count=0;
+ 137   2                      TimeSetFlashFlag=!TimeSetFlashFlag;
+ 138   2              }
+ 139   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1009    ----
+   CONSTANT SIZE    =     31    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      6    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
