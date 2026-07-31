@@ -2,11 +2,13 @@
 #include "LCD1602.h"
 #include "OneWire.h"
 #include "DS18B20.h"
-
+#include "Delay.h"
 
 float T;
 void main()
 {
+	DS18B20_ConvertT();
+	Delay(1000);
 	LCD_Init();
 	LCD_ShowString(1,1,"Temperature:");
 	while(1)
