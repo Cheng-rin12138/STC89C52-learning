@@ -1,0 +1,1 @@
+"..\12.2秒表（定时器扫描按键数码管）\Key.c" OPTIMIZE (8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\Key.lst) OBJECT(.\Objects\Key.obj)
