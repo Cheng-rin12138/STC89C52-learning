@@ -1,0 +1,38 @@
+C51 COMPILER V9.54   INT0                                                                  08/03/2026 16:04:10 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE INT0
+OBJECT MODULE PLACED IN .\Objects\Int0.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Int0.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\Int0
+                    -.lst) OBJECT(.\Objects\Int0.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          void Int0_Init(void)
+   3          {
+   4   1              IT0=1;//下降沿触发
+   5   1              IE0=0;//中断标志，置0即可
+   6   1              EX0=1;//打开该中断
+   7   1              EA=1;//打开中断总开关
+   8   1              PX0=1;//高优先级，可打断别的中断进行嵌套
+   9   1      }
+  10          //外部中断函数模板
+  11          /*void Int0_Routine(void) interrupt 0
+  12          {
+  13                  
+  14          }*/
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     11    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

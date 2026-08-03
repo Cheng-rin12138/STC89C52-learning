@@ -1,0 +1,133 @@
+C51 COMPILER V9.54   IR                                                                    08/03/2026 15:26:59 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE IR
+OBJECT MODULE PLACED IN .\Objects\IR.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE IR.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\IR.lst
+                    -) OBJECT(.\Objects\IR.obj)
+
+line level    source
+
+   1          #include <REGX52.H>
+   2          #include "Timer0.h"
+   3          #include "Int0.h"
+   4          unsigned int IR_Time;
+   5          unsigned char IR_State;
+   6          
+   7          unsigned char IR_Data[4];//移位运算限制16位以下
+   8          unsigned char IR_pData;
+   9          
+  10          unsigned char IR_DataFlag;
+  11          unsigned char IR_RepeatFlag;
+  12          unsigned char IR_Address;
+  13          unsigned char IR_Command;
+  14          void IR_Init()
+  15          {
+  16   1              Timer0_Init();
+  17   1              Int0_Init();
+  18   1      }
+  19          unsigned char IR_GetDataFlag(void)
+  20          {
+  21   1              if(IR_DataFlag)
+  22   1              {
+  23   2                      IR_DataFlag=0;
+  24   2                      return 1;
+  25   2              }
+  26   1              return 0;
+  27   1      }
+  28          unsigned char IR_GetRepeat(void)
+  29          {
+  30   1              if(IR_RepeatFlag)
+  31   1              {
+  32   2                      IR_RepeatFlag=0;
+  33   2                      return 1;
+  34   2              }
+  35   1              return 0;
+  36   1      }
+  37          unsigned char IR_GetAddress(void)
+  38          {
+  39   1              return IR_Address;
+  40   1      }
+  41          unsigned char IR_GetCommand(void)
+  42          {
+  43   1              return IR_Command;
+  44   1      }
+  45          void Int0_Routine(void) interrupt 0
+  46          {
+  47   1              if(IR_State==0)
+  48   1              {
+  49   2                      Timer0_SetCounter(0);//清零
+  50   2                      Timer0_Run(1);
+  51   2                      IR_State=1;
+  52   2              }
+  53   1              else if(IR_State==1)
+  54   1              {
+C51 COMPILER V9.54   IR                                                                    08/03/2026 15:26:59 PAGE 2   
+
+  55   2                      IR_Time=Timer0_GetCounter();
+  56   2                      Timer0_SetCounter(0);//清零
+  57   2                      if(IR_Time>13500-500 && IR_Time<13500+500)//开始Start信号总长13500us左右
+  58   2                      {IR_State=2;}
+  59   2                      else if(IR_Time>11250-500 && IR_Time<11250+500)//Repeat信号
+  60   2                      {
+  61   3                              IR_RepeatFlag=1;
+  62   3                              Timer0_Run(0);
+  63   3                              IR_State=0;
+  64   3                      }
+  65   2                      else
+  66   2                      {
+  67   3                              IR_State=1;
+  68   3                      }
+  69   2              }
+  70   1              else if(IR_State==2)
+  71   1              {
+  72   2                      IR_Time=Timer0_GetCounter();
+  73   2                      Timer0_SetCounter(0);//清零
+  74   2                      if(IR_Time>1120-500 && IR_Time<1120+500)//逻辑0时间
+  75   2                      {
+  76   3                              //对应位置0用&=~
+  77   3                              IR_Data[IR_pData/8]&=~(0x01<<(IR_pData%8));//pData大于8位跳到下一个字节
+  78   3                              IR_pData++;
+  79   3                      }
+  80   2                      else if(IR_Time>2250-500 && IR_Time<2250+500)//逻辑1时间
+  81   2                      {
+  82   3                              //对应位置1用|=
+  83   3                              IR_Data[IR_pData/8]|=(0x01<<(IR_pData%8));//pData大于8位跳到下一个字节
+  84   3                              IR_pData++;
+  85   3                      }
+  86   2                      else
+  87   2                      {
+  88   3                              //数据出错时
+  89   3                              IR_pData=0;
+  90   3                              IR_State=1;
+  91   3                      }
+  92   2                      if(IR_pData>=32)
+  93   2                      {
+  94   3                              IR_pData=0;
+  95   3                              if((IR_Data[0]==~IR_Data[1])  && (IR_Data[2]==~IR_Data[3]))
+  96   3                              {
+  97   4                                      IR_Address=IR_Data[0];
+  98   4                                      IR_Command=IR_Data[2];
+  99   4                                      IR_DataFlag=1;
+ 100   4                              }
+ 101   3                              Timer0_Run(0);//关闭定时器
+ 102   3                              IR_State=0;//回归空闲状态
+ 103   3                      }
+ 104   2              }
+ 105   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    370    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     12    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.54   IR                                                                    08/03/2026 15:26:59 PAGE 3   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
